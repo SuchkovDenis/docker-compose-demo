@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ProductList from "../components/ProductList";
 import { TextField, Container } from "@mui/material";
-import API_BASE_URL from "../config";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -10,13 +9,13 @@ function Home() {
   useEffect(() => {
     // Если строка поиска пустая, загружаем все продукты
     if (!searchTerm) {
-      fetch(`${API_BASE_URL}/api/products/`)
+      fetch("/api/products/")
         .then((response) => response.json())
         .then((data) => setProducts(data))
         .catch((error) => console.error("Error fetching products:", error));
     } else {
       // Иначе ищем продукты по поисковому запросу
-      fetch(`${API_BASE_URL}/api/products/search?query=${searchTerm}`)
+      fetch(`/api/products/search?query=${searchTerm}`)
         .then((response) => response.json())
         .then((data) => setProducts(data))
         .catch((error) => console.error("Error searching products:", error));
