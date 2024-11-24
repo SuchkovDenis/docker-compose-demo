@@ -1,0 +1,51 @@
+services:
+  backend:
+    image: shop_backend
+    container_name: shop_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" 
+    depends_on:
+      search:
+        condition: service_healthy
+      db:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/movies
+      - SPRING_DATASOURCE_USERNAME=movies_user
+      - SPRING_DATASOURCE_PASSWORD=movies_password
+      - SPRING_ELASTICSEARCH_URIS=search:9200
+
+  db:
+    image: postgres:16.0
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: movies
+      POSTGRES_USER: movies_user
+      POSTGRES_PASSWORD: movies_password
+
+  search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.22
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200/_cluster/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    image: shop_frontend
+    container_name: shop_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_BACKEND_URL: http://localhost:8080
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
