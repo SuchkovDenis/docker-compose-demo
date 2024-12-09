@@ -1,9 +1,8 @@
 services:
   backend:
+    image: shop_backend
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    image: shop_backend
     depends_on:
       db:
         condition: service_healthy
@@ -16,10 +15,9 @@ services:
       SPRING_ELASTICSEARCH_URIS: http://search:9200
 
   frontend:
+    image: shop_frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    image: shop_frontend
     ports:
       - "80:80"
     environment:
